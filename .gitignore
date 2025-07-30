@@ -2,10 +2,10 @@
 *.d
 
 # Compiled Object files
-*.slo
-*.lo
 *.o
 *.obj
+*.lo
+*.slo
 
 # Precompiled Headers
 *.gch
@@ -13,29 +13,69 @@
 
 # Linker files
 *.ilk
+*.idb
+*.tlog
 
-# Debugger Files
+# Debug Symbols
 *.pdb
+*.dwo
 
-# Compiled Dynamic libraries
+# Compiled Libraries
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
 *.a
 *.lib
+*.la
+*.lai
 
 # Executables
 *.exe
 *.out
 *.app
 
-# debug information files
-*.dwo
+# Backup / Temp files
+*.tmp
+*.bak
+*.swp
+*.suo
+*.ncb
+*.aps
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+Makefile
+
+# Build output folders
+build*/
+_build*/
+out*/
+bin*/
+lib*/
+
+# IDE-specific
+.vs/
+.idea/
+
+# Visual Studio user files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+
+# Visual Studio cache
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# OS-specific
+.DS_Store
+Thumbs.db
