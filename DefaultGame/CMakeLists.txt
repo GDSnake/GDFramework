@@ -1,146 +1,169 @@
-cmake_minimum_required(VERSION 3.15)
-project(BlockFall)
+cmake_minimum_required(VERSION 3.25)
 
-set(CMAKE_CXX_STANDARD 17)
-
-add_executable(BlockFall source/main.cpp)
-
-# ---------------------------------------------------------
-# Create a default config.json if missing
-# ---------------------------------------------------------
-set(CONFIG_FILE "${CMAKE_SOURCE_DIR}/config.json")
-if (NOT EXISTS ${CONFIG_FILE})
-    file(WRITE ${CONFIG_FILE} "{\n")
-    file(APPEND ${CONFIG_FILE} "    \"title\": \"Default Game Name\",\n")
-    file(APPEND ${CONFIG_FILE} "    \"window_width\": 1280,\n")
-    file(APPEND ${CONFIG_FILE} "    \"window_height\": 720,\n")
-    file(APPEND ${CONFIG_FILE} "    \"fullscreen\": false\n")
-    file(APPEND ${CONFIG_FILE} "}\n")
-    message(STATUS "Created default config.json")
+if(POLICY CMP0144)
+    cmake_policy(SET CMP0144 NEW)
 endif()
 
-include(FetchContent)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-# ---------------------------------------------------------
-# JSON Setup (download if missing, otherwise use local)
-# ---------------------------------------------------------
-set(JSON_LOCAL_PATH "${CMAKE_SOURCE_DIR}/libs/JSON/include/nlohmann/json.hpp")
+project(DefaultGame LANGUAGES CXX)
 
-if (EXISTS ${JSON_LOCAL_PATH})
-    message(STATUS "Using local nlohmann/json.hpp")
-    target_include_directories(BlockFall PRIVATE ${CMAKE_SOURCE_DIR}/libs/JSON/include)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(WIN32)
+    if(MSVC OR CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+        set(SDL_PACKAGE_FLAVOR "VC")
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)$")
+        set(SDL_PACKAGE_FLAVOR "mingw")
+    else()
+        message(FATAL_ERROR "Unsupported Windows compiler: ${CMAKE_CXX_COMPILER_ID}")
+    endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_compile_options(/MP)
+endif()
+
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
+file(GLOB_RECURSE PROJECT_HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h")
+
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/source")
+target_compile_definitions(${PROJECT_NAME} PRIVATE "$<$<CONFIG:Debug>:DEBUG_BUILD>")
+
+if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /UUNICODE /U_UNICODE)
 else()
-    message(STATUS "Downloading nlohmann/json ...")
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/libs/JSON)
+    target_compile_options(${PROJECT_NAME} PRIVATE -UUNICODE -U_UNICODE)
+endif()
 
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+
+include(FetchContent)
+set(FETCHCONTENT_BASE_DIR "${CMAKE_BINARY_DIR}/_deps")
+
+set(JSON_LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/JSON/include/nlohmann/json.hpp")
+if(EXISTS "${JSON_LOCAL_PATH}")
+    target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/libs/JSON/include")
+else()
     FetchContent_Declare(
         json
         URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     FetchContent_MakeAvailable(json)
-    file(COPY ${json_SOURCE_DIR}/include DESTINATION ${CMAKE_SOURCE_DIR}/libs/JSON)
-    target_include_directories(BlockFall PRIVATE ${CMAKE_SOURCE_DIR}/libs/JSON/include)
+    target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 endif()
 
-# ---------------------------------------------------------
-# SDL3 Setup (download if missing)
-# ---------------------------------------------------------
-set(SDL3_DIR "${CMAKE_SOURCE_DIR}/libs/SDL3")
+if(WIN32)
+    function(download_sdl_package package version archive_prefix root config_file)
+        if(EXISTS "${root}/cmake/${config_file}")
+            message(STATUS "Using prebuilt ${package} ${version} from ${root}")
+            return()
+        endif()
 
-if (EXISTS "${SDL3_DIR}/include/SDL3/SDL.h")
-    message(STATUS "Using local SDL3 at ${SDL3_DIR}")
+        set(archive_name "${archive_prefix}-devel-${version}-${SDL_PACKAGE_FLAVOR}.zip")
+        set(archive "${CMAKE_BINARY_DIR}/${archive_name}")
+        set(url "https://github.com/libsdl-org/${package}/releases/download/release-${version}/${archive_name}")
+        set(extract_dir "${CMAKE_BINARY_DIR}/${package}-${version}-extract")
+
+        message(STATUS "Downloading prebuilt ${package} ${version} ...")
+        file(DOWNLOAD "${url}" "${archive}" SHOW_PROGRESS STATUS download_status)
+        list(GET download_status 0 download_code)
+        list(GET download_status 1 download_message)
+        if(NOT download_code EQUAL 0)
+            message(FATAL_ERROR "Failed to download ${package} ${version}: ${download_message}")
+        endif()
+
+        file(REMOVE_RECURSE "${extract_dir}")
+        file(MAKE_DIRECTORY "${extract_dir}" "${root}")
+        file(ARCHIVE_EXTRACT INPUT "${archive}" DESTINATION "${extract_dir}")
+        file(GLOB extracted_roots LIST_DIRECTORIES true "${extract_dir}/*")
+        list(LENGTH extracted_roots extracted_root_count)
+        if(NOT extracted_root_count EQUAL 1)
+            message(FATAL_ERROR "Unexpected ${package} archive layout")
+        endif()
+        list(GET extracted_roots 0 extracted_root)
+        file(COPY "${extracted_root}/" DESTINATION "${root}")
+
+        if(NOT EXISTS "${root}/cmake/${config_file}")
+            message(FATAL_ERROR "Downloaded ${package} ${version} but ${config_file} was not found")
+        endif()
+    endfunction()
+
+    set(SDL3_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/${SDL_PACKAGE_FLAVOR}/SDL3" CACHE PATH "SDL3 package root")
+    set(SDL3_image_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/${SDL_PACKAGE_FLAVOR}/SDL3_image" CACHE PATH "SDL3_image package root")
+    set(SDL3_mixer_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/${SDL_PACKAGE_FLAVOR}/SDL3_mixer" CACHE PATH "SDL3_mixer package root")
+    set(SDL3_ttf_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/${SDL_PACKAGE_FLAVOR}/SDL3_ttf" CACHE PATH "SDL3_ttf package root")
+
+    download_sdl_package(SDL 3.4.14 SDL3 "${SDL3_ROOT}" SDL3Config.cmake)
+    download_sdl_package(SDL_image 3.4.4 SDL3_image "${SDL3_image_ROOT}" SDL3_imageConfig.cmake)
+    download_sdl_package(SDL_mixer 3.2.4 SDL3_mixer "${SDL3_mixer_ROOT}" SDL3_mixerConfig.cmake)
+    download_sdl_package(SDL_ttf 3.2.2 SDL3_ttf "${SDL3_ttf_ROOT}" SDL3_ttfConfig.cmake)
+
+    find_package(SDL3 3.4.14 EXACT CONFIG REQUIRED HINTS "${SDL3_ROOT}")
+    find_package(SDL3_image 3.4.4 EXACT CONFIG REQUIRED HINTS "${SDL3_image_ROOT}")
+    find_package(SDL3_mixer 3.2.4 EXACT CONFIG REQUIRED HINTS "${SDL3_mixer_ROOT}")
+    find_package(SDL3_ttf 3.2.2 EXACT CONFIG REQUIRED HINTS "${SDL3_ttf_ROOT}")
 else()
-    message(STATUS "Downloading SDL3 precompiled binaries ...")
-    file(MAKE_DIRECTORY ${SDL3_DIR})
-
-    if (WIN32)
-        set(SDL3_URL https://github.com/libsdl-org/SDL/releases/download/release-3.2.18/SDL3-devel-3.2.18-VC.zip)
-    else()
-        set(SDL3_URL https://github.com/libsdl-org/SDL/releases/download/release-3.2.18/SDL3-3.2.18.tar.gz)
-    endif()
-
-    set(FETCHCONTENT_BASE_DIR ${CMAKE_BINARY_DIR}/_deps)
-    FetchContent_Declare(
-        SDL3
-        URL ${SDL3_URL}
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-    FetchContent_Populate(SDL3)
-
-    message(STATUS "SDL3 downloaded to: ${sdl3_SOURCE_DIR}")
-    file(GLOB CONTENTS "${sdl3_SOURCE_DIR}/*")
-    message(STATUS "Contents: ${CONTENTS}")
-
-    set(SDL3_COPY_DIR "")
-    if (EXISTS "${sdl3_SOURCE_DIR}/include/SDL3/SDL.h")
-        set(SDL3_COPY_DIR "${sdl3_SOURCE_DIR}")
-    else()
-        foreach(child ${CONTENTS})
-            if (EXISTS "${child}/include/SDL3/SDL.h")
-                set(SDL3_COPY_DIR "${child}")
-                break()
-            endif()
-        endforeach()
-    endif()
-
-    if (SDL3_COPY_DIR STREQUAL "")
-        message(FATAL_ERROR "SDL3 extraction failed: include/SDL3/SDL.h not found.")
-    else()
-        message(STATUS "Found SDL3 extracted in: ${SDL3_COPY_DIR}")
-    endif()
-
-    file(COPY "${SDL3_COPY_DIR}/include" DESTINATION "${SDL3_DIR}")
-    if (EXISTS "${SDL3_COPY_DIR}/lib")
-        file(COPY "${SDL3_COPY_DIR}/lib" DESTINATION "${SDL3_DIR}")
-    endif()
-    if (EXISTS "${SDL3_COPY_DIR}/bin")
-        file(COPY "${SDL3_COPY_DIR}/bin" DESTINATION "${SDL3_DIR}")
-    endif()
+    find_package(SDL3 CONFIG REQUIRED)
+    find_package(SDL3_image CONFIG REQUIRED)
+    find_package(SDL3_mixer CONFIG REQUIRED)
+    find_package(SDL3_ttf CONFIG REQUIRED)
 endif()
 
-# ---------------------------------------------------------
-# SDL3 Linking
-# ---------------------------------------------------------
-if (WIN32)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(ARCH_DIR "x64")
-    else()
-        set(ARCH_DIR "x86")
-    endif()
-
-    include_directories(${SDL3_DIR}/include)
-
-    set(SDL3_LIB_DIR "${SDL3_DIR}/lib/${ARCH_DIR}")
-
-    target_link_directories(BlockFall PRIVATE ${SDL3_LIB_DIR})
-    target_link_libraries(BlockFall PRIVATE SDL3)
-
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(SDL_DLL "SDL3d.dll")
-    else()
-        set(SDL_DLL "SDL3.dll")
-    endif()
-
-    if (NOT EXISTS "${SDL3_LIB_DIR}/${SDL_DLL}")
-        set(SDL_DLL "SDL3.dll")
-    endif()
-
-    add_custom_command(TARGET BlockFall POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${SDL3_LIB_DIR}/${SDL_DLL}"
-            $<TARGET_FILE_DIR:BlockFall>
-    )
-else()
-    find_package(SDL3 REQUIRED CONFIG)
-    target_link_libraries(BlockFall PRIVATE SDL3::SDL3)
-endif()
-
-# ---------------------------------------------------------
-# Copy config.json after build
-# ---------------------------------------------------------
-add_custom_command(TARGET BlockFall POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/config.json"
-        $<TARGET_FILE_DIR:BlockFall>
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    SDL3::SDL3
+    SDL3_image::SDL3_image
+    SDL3_mixer::SDL3_mixer
+    SDL3_ttf::SDL3_ttf
 )
+
+if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
+    )
+
+    foreach(SDL_TARGET SDL3::SDL3 SDL3_image::SDL3_image SDL3_mixer::SDL3_mixer SDL3_ttf::SDL3_ttf)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:${SDL_TARGET}>"
+                "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+            VERBATIM
+        )
+    endforeach()
+endif()
+
+set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/config.json")
+if(NOT EXISTS "${CONFIG_FILE}")
+    file(WRITE "${CONFIG_FILE}" [=[
+{
+    "title": "Default Game Name",
+    "window_width": 1280,
+    "window_height": 720,
+    "fullscreen": false
+}
+]=])
+    message(STATUS "Created default config.json")
+endif()
+
+add_custom_target(${PROJECT_NAME}Config ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CONFIG_FILE}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    DEPENDS "${CONFIG_FILE}"
+    VERBATIM
+)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}Config)
+
+set(ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+file(MAKE_DIRECTORY "${ASSETS_DIR}")
+add_custom_target(${PROJECT_NAME}Assets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${ASSETS_DIR}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
+    VERBATIM
+)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}Assets)
