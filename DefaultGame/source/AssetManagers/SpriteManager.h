@@ -1,32 +1,36 @@
 #pragma once
-
 #include <memory>
 #include <string>
+
 #include <unordered_map>
 
-#include <SDL3/SDL_render.h>
+class Sprite;
+struct SDL_Surface;
+
+namespace SpriteManagerHelpers
+{
+    SDL_Surface* loadImage(const std::string& filePath);
+}
+
 
 class SpriteManager
 {
 public:
+
     static SpriteManager& getInstance()
     {
         static SpriteManager instance;
         return instance;
     }
 
-    SpriteManager(const SpriteManager&) = delete;
-    SpriteManager& operator=(const SpriteManager&) = delete;
-
     void load();
-    SDL_Texture* getTexture(const std::string& name) const noexcept;
-    void clear();
-
+    std::shared_ptr<Sprite> getSprite(const std::string& name) const;
+    void shutdown();
 private:
-    using TexturePtr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
-
-    SpriteManager() = default;
+    SpriteManager();
     ~SpriteManager();
 
-    std::unordered_map<std::string, TexturePtr> _textures;
+    void loadSprites();
+
+    std::unordered_map<std::string, std::shared_ptr<Sprite>> _sprites;
 };

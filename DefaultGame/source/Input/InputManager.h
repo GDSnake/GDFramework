@@ -10,17 +10,10 @@ enum class KeyState {
     Released
 };
 
-struct KeyCooldownData {
-    float dasTimer = 0.0f;
-    float arrTimer = 0.0f;
-    bool dasTriggered = false;
-    float softDrop = 0.0f;
-};
-
 class InputManager {
 public:
     void handleEvent(const SDL_Event& event);
-    void update(float deltaTime);
+    void update();
 
     bool isKeyPressed(SDL_Scancode key) const;
     bool isKeyHeld(SDL_Scancode key) const;
@@ -29,9 +22,6 @@ public:
     bool isMouseButtonPressed(Uint8 button) const;
     bool isMouseButtonHeld(Uint8 button) const;
     bool isMouseButtonReleased(Uint8 button) const;
-
-    bool horizontalMovementIfNotOnCooldown(SDL_Scancode key, float das, float arr);
-    bool isSoftDropping(SDL_Scancode key);
 
     inline void quit() { _quit = true; }
     inline bool shouldQuit() const { return _quit; }
@@ -45,7 +35,6 @@ private:
 
     std::unordered_map<SDL_Scancode, KeyState> _keyStates;
     std::unordered_map<Uint8, KeyState> _mouseStates;
-    std::unordered_map<SDL_Scancode, KeyCooldownData> _keyCooldowns;
 
     int _mouseX = 0;
     int _mouseY = 0;

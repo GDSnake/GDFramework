@@ -3,43 +3,54 @@
 #include <SDL3/SDL_log.h>
 #include <SDL3_image/SDL_image.h>
 
+#include <exception>
+
+#include "Entities/Sprite.h"
 #include "Config/Config.h"
-#include "Core/Renderer.h"
+
+
+SDL_Surface* SpriteManagerHelpers::loadImage(const std::string& filePath)
+{
+    return IMG_Load(filePath.c_str());
+}
+
+std::shared_ptr<Sprite> SpriteManager::getSprite(const std::string& name) const
+{
+    const auto sprite = _sprites.find(name);
+    return sprite == _sprites.end() ? nullptr : sprite->second;
+}
+
+SpriteManager::SpriteManager()
+{
+}
 
 SpriteManager::~SpriteManager()
 {
-    clear();
+    shutdown();
+}
+
+void SpriteManager::shutdown()
+{
+    _sprites.clear();
 }
 
 void SpriteManager::load()
 {
-    clear();
+    loadSprites();
+}
 
-    SDL_Renderer* renderer = Renderer::getInstance().getRenderer();
-    if (!renderer)
+void SpriteManager::loadSprites()
+{
+    shutdown();
+    for (const auto& [name, image] : Config::getInstance().getConfigData().images)
     {
-        return;
-    }
-
-    for (const auto& [name, path] : Config::getInstance().getConfigData().images)
-    {
-        SDL_Texture* texture = IMG_LoadTexture(renderer, path.c_str());
-        if (!texture)
+        try
         {
-            SDL_Log("Unable to load image '%s' (%s): %s", name.c_str(), path.c_str(), SDL_GetError());
-            continue;
+            _sprites.emplace(name, std::make_shared<Sprite>(image.path, image.width, image.height));
         }
-        _textures.emplace(name, TexturePtr(texture, SDL_DestroyTexture));
+        catch (const std::exception& error)
+        {
+            SDL_Log("Unable to load sprite '%s' from '%s': %s", name.c_str(), image.path.c_str(), error.what());
+        }
     }
-}
-
-SDL_Texture* SpriteManager::getTexture(const std::string& name) const noexcept
-{
-    const auto texture = _textures.find(name);
-    return texture == _textures.end() ? nullptr : texture->second.get();
-}
-
-void SpriteManager::clear()
-{
-    _textures.clear();
 }

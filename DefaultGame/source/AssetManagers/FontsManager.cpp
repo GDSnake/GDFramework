@@ -7,7 +7,7 @@
 
 FontsManager::~FontsManager()
 {
-    clear();
+    shutdown();
 }
 
 void FontsManager::load()
@@ -42,4 +42,9 @@ void FontsManager::clear()
         }
     }
     _fonts.clear();
+}
+
+void FontsManager::shutdown()
+{
+    clear();
 }

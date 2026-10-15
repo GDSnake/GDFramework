@@ -46,15 +46,14 @@ bool Game::init()
         return false;
     }
 
-    if (TTF_Init())
-    {
-        _ttfInitialized = true;
-        FontsManager::getInstance().load();
-    }
-    else
+    if (!TTF_Init())
     {
         SDL_Log("SDL_ttf initialization failed: %s", SDL_GetError());
+        shutdown();
+        return false;
     }
+    _ttfInitialized = true;
+    FontsManager::getInstance().load();
 
     SpriteManager::getInstance().load();
     if (config.audio.contains("background_music") || config.audio.contains("bgm"))
@@ -124,14 +123,14 @@ void Game::shutdown()
     }
 
     AudioManager::getInstance().shutdown();
-    SpriteManager::getInstance().clear();
-    FontsManager::getInstance().clear();
+    SpriteManager::getInstance().shutdown();
+    FontsManager::getInstance().shutdown();
+    Renderer::getInstance().shutdown();
     if (_ttfInitialized)
     {
         TTF_Quit();
         _ttfInitialized = false;
     }
-    Renderer::getInstance().shutdown();
     SDL_Quit();
     _sdlInitialized = false;
 }

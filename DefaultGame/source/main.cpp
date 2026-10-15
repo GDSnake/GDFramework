@@ -4,16 +4,21 @@
 #include "Game/Game.h"
 
 int main() {
-    if (!Config::getInstance().loadConfig()) {
-        std::cerr << "Configuration file has an error.\n";
+
+    Config::getInstance().loadConfig();
+
+    if (Config::getInstance().getConfigData().hasError)
+    {
+        std::cerr << "Configuration file has an error!" << '\n';
+        std::cerr << "Press Enter to exit...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         return 1;
     }
 
     Game game;
-    if (!game.init()) {
-        return 1;
+    if (game.init())
+    {
+        game.run();
     }
-
-    game.run();
     return 0;
 }

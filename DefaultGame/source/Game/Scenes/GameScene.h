@@ -2,14 +2,31 @@
 
 #include "Scene.h"
 
+#include "Input/InputManager.h"
+
 class GameScene : public Scene
 {
 public:
     void init() override;
-    void handleEvents(const SDL_Event& event) override;
     void handleInput() override;
     void update(float deltaTime) override;
-    void render() override;
     void cleanup() override;
     std::string getName() const override;
+    
+    bool shouldQuit() const;
+    void handleEvents(const SDL_Event& event) override;
+
+private:
+    void render() override;
+    void renderTexts();
+    
+    void updateStrings();
+
+    std::unique_ptr<InputManager> _input;
+    const ConfigData& _configData = Config::getInstance().getConfigData();
+
+    // Text
+    TTF_Font* _titleFont = nullptr;
+
+    std::string _titleText;
 };
