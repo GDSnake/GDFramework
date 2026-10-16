@@ -2,12 +2,12 @@
 
 #include <string>
 #include <unordered_map>
+
 #include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_rect.h>
 
 #include "Config/Config.h"
 
-enum class FontNames : uint8_t;
 struct TTF_Font;
 
 namespace FontColor
@@ -41,14 +41,13 @@ struct FontData
     int fontSize;
 };
 
-static const FontData TitleFontInfo = {.baseText = FontText::Title, .origin = {20.0f, 10.0f }, .color = FontColor::Black, .fontName = FontNames::GameBoyFont, .fontSize = FontSize::Title};
-
-const FontData& getLevelFontInfo();
-const FontData& getLinesFontInfo();
-const FontData& getGameOverFontInfo();
-const FontData& getPauseFontInfo();
-
-static const FontData HelpFontInfo = { .baseText = FontText::HelptText, .origin = {20.0f, 10.0f }, .color = FontColor::Black, .fontName = FontNames::DefaultFont, .fontSize = FontSize::Help };
+inline const FontData TitleFontInfo = {
+    .baseText = FontText::Title,
+    .origin = {20.0f, 10.0f},
+    .color = FontColor::Black,
+    .fontName = FontNames::DefaultFont,
+    .fontSize = FontSize::Title
+};
 
 class FontsManager {
 
@@ -60,7 +59,13 @@ public:
         return instance;
     }
 
-    TTF_Font* getFont(FontNames font) const;
+    void load();
+    TTF_Font* getFont(const std::string& name) const noexcept;
+    TTF_Font* getFont(FontNames font) const noexcept
+    {
+        return getFont(FontUtils::to_string(font));
+    }
+    void clear();
     void shutdown();
 
 private:

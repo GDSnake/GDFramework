@@ -1,0 +1,23 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "samples-ninja",
+      "displayName": "Samples (Ninja Multi-Config)",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/../out/build/samples-ninja"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "samples-ninja",
+      "configuration": "Debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "samples-ninja",
+      "configuration": "Release"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+    "window": {
+        "title": "SDL Sample: Static Square",
+        "width": 960,
+        "height": 640,
+        "fullscreen": false,
+        "target_fps": 60
+    },
+    "sound": {},
+    "images": {},
+    "fonts": {
+        "defaultFont": ""
+    }
+}

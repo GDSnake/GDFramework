@@ -83,6 +83,11 @@ inline void loadConfig()
         }
 
         const json data = json::parse(file);
+        if (!data.is_object())
+        {
+            throw std::runtime_error("The root of config.json must be an object");
+        }
+
         ConfigData cfg;
 
         const json& window = data.at("window");
@@ -92,8 +97,17 @@ inline void loadConfig()
         cfg.fullscreen = window.at("fullscreen").get<bool>();
         cfg.targetFPS = window.value("target_fps", cfg.targetFPS);
 
-        const json& sound = data.at("sound");
-        // read sound assets names
+        if (const auto sound = data.find("sound"); sound != data.end())
+        {
+            if (!sound->is_object())
+            {
+                throw std::runtime_error("sound must be an object");
+            }
+            for (auto track = sound->begin(); track != sound->end(); ++track)
+            {
+                cfg.audio[track.key()] = track.value().get<std::string>();
+            }
+        }
 
         if (const auto images = data.find("images"); images != data.end())
         {
@@ -136,7 +150,7 @@ inline void loadConfig()
             cfg.fonts[fontName] = font->get<std::string>();
         }
 
-        _data = cfg;
+        _data = std::move(cfg);
     }
     catch (const std::exception& error)
     {

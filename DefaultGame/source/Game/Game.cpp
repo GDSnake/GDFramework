@@ -166,8 +166,8 @@ void Game::update(float deltaTime)
         _scene->update(deltaTime);
     }
 
-    _input.update(deltaTime);
-    if (_input.shouldQuit())
+    _input.update();
+    if (_input.shouldQuit() || (_scene && _scene->shouldQuit()))
     {
         _isRunning = false;
     }

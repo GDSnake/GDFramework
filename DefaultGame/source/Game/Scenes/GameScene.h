@@ -1,8 +1,12 @@
 #pragma once
 
-#include "Scene.h"
+#include <memory>
+#include <string>
 
+#include "Scene.h"
 #include "Input/InputManager.h"
+
+struct TTF_Font;
 
 class GameScene : public Scene
 {
@@ -27,6 +31,5 @@ private:
 
     // Text
     TTF_Font* _titleFont = nullptr;
-
     std::string _titleText;
 };

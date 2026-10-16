@@ -8,6 +8,17 @@ AudioManager::AudioManager(): _mixer(nullptr, MIX_DestroyMixer),
                               _bgm(nullptr, MIX_DestroyAudio),
                               _track(nullptr, MIX_DestroyTrack)
 {   
+    const auto& audio = Config::getInstance().getConfigData().audio;
+    auto music = audio.find("background_music");
+    if (music == audio.end())
+    {
+        music = audio.find("bgm");
+    }
+    if (music == audio.end() || music->second.empty())
+    {
+        return;
+    }
+
     _mixInitialized = MIX_Init();
     if (!_mixInitialized) {
         std::cerr << "MIX_Init failed: " << SDL_GetError() << '\n';
@@ -18,9 +29,10 @@ AudioManager::AudioManager(): _mixer(nullptr, MIX_DestroyMixer),
     if (!_mixer)
     {
         std::cerr << "Audio Manager Init Error: " << SDL_GetError() << '\n';
+        return;
     }
 
-    _bgm.reset(MIX_LoadAudio(_mixer.get(), Config::getInstance().getConfigData().bgmPath.c_str(), true));
+    _bgm.reset(MIX_LoadAudio(_mixer.get(), music->second.c_str(), true));
     if (!_bgm)
     {
         std::cerr << "Audio Manager BGM Error: " << SDL_GetError() << '\n';
