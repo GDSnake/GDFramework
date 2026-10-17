@@ -8,6 +8,7 @@
 
 void GameScene::init()
 {
+    _input = std::make_unique<InputManager>();
     SpriteManager::getInstance();
     Renderer::getInstance();
 

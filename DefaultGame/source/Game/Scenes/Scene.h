@@ -16,4 +16,5 @@ public:
     virtual void render() = 0;
     virtual void cleanup() = 0;
     virtual std::string getName() const = 0;
+    virtual bool shouldQuit() const = 0;
 };

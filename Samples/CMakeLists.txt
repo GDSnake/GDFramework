@@ -77,6 +77,10 @@ if(WIN32)
     if(NOT EXISTS "${SDL3_image_ROOT}/cmake/SDL3_imageConfig.cmake")
         set(SDL3_image_ROOT "${SDL_PACKAGE_BUILD}/SDL3_image")
     endif()
+    set(SDL3_mixer_ROOT "${SDL_PACKAGE_CACHE}/SDL3_mixer")
+    if(NOT EXISTS "${SDL3_mixer_ROOT}/cmake/SDL3_mixerConfig.cmake")
+        set(SDL3_mixer_ROOT "${SDL_PACKAGE_BUILD}/SDL3_mixer")
+    endif()
     set(SDL3_ttf_ROOT "${SDL_PACKAGE_CACHE}/SDL3_ttf")
     if(NOT EXISTS "${SDL3_ttf_ROOT}/cmake/SDL3_ttfConfig.cmake")
         set(SDL3_ttf_ROOT "${SDL_PACKAGE_BUILD}/SDL3_ttf")
@@ -84,14 +88,17 @@ if(WIN32)
 
     ensure_sdl_package(SDL 3.4.14 SDL3 "${SDL3_ROOT}" SDL3Config.cmake)
     ensure_sdl_package(SDL_image 3.4.4 SDL3_image "${SDL3_image_ROOT}" SDL3_imageConfig.cmake)
+    ensure_sdl_package(SDL_mixer 3.2.4 SDL3_mixer "${SDL3_mixer_ROOT}" SDL3_mixerConfig.cmake)
     ensure_sdl_package(SDL_ttf 3.2.2 SDL3_ttf "${SDL3_ttf_ROOT}" SDL3_ttfConfig.cmake)
 
     find_package(SDL3 3.4.14 EXACT CONFIG REQUIRED HINTS "${SDL3_ROOT}")
     find_package(SDL3_image 3.4.4 EXACT CONFIG REQUIRED HINTS "${SDL3_image_ROOT}")
+    find_package(SDL3_mixer 3.2.4 EXACT CONFIG REQUIRED HINTS "${SDL3_mixer_ROOT}")
     find_package(SDL3_ttf 3.2.2 EXACT CONFIG REQUIRED HINTS "${SDL3_ttf_ROOT}")
 else()
     find_package(SDL3 CONFIG REQUIRED)
     find_package(SDL3_image CONFIG REQUIRED)
+    find_package(SDL3_mixer CONFIG REQUIRED)
     find_package(SDL3_ttf CONFIG REQUIRED)
 endif()
 
@@ -99,11 +106,20 @@ add_library(SampleFramework STATIC
     "${FRAMEWORK_SOURCE_DIR}/Core/Renderer.cpp"
     "${FRAMEWORK_SOURCE_DIR}/Entities/Sprite.cpp"
     "${FRAMEWORK_SOURCE_DIR}/AssetManagers/SpriteManager.cpp"
+    "${FRAMEWORK_SOURCE_DIR}/AssetManagers/AudioManager.cpp"
+    "${FRAMEWORK_SOURCE_DIR}/AssetManagers/FontsManager.cpp"
+    "${FRAMEWORK_SOURCE_DIR}/Game/Game.cpp"
+    "${FRAMEWORK_SOURCE_DIR}/Game/Scenes/GameScene.cpp"
+    "${FRAMEWORK_SOURCE_DIR}/Input/InputManager.cpp"
 )
-target_include_directories(SampleFramework PUBLIC "${FRAMEWORK_SOURCE_DIR}")
+target_include_directories(SampleFramework PUBLIC
+    "${FRAMEWORK_SOURCE_DIR}"
+    "${FRAMEWORK_SOURCE_DIR}/Game/Scenes"
+)
 target_link_libraries(SampleFramework PUBLIC
     SDL3::SDL3
     SDL3_image::SDL3_image
+    SDL3_mixer::SDL3_mixer
     SDL3_ttf::SDL3_ttf
     nlohmann_json::nlohmann_json
 )
@@ -115,7 +131,7 @@ else()
 endif()
 
 function(add_sample target source sample_directory)
-    add_executable(${target} "${source}")
+    add_executable(${target} "${source}" ${ARGN})
     target_link_libraries(${target} PRIVATE SampleFramework)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${target}"
@@ -138,8 +154,17 @@ function(add_sample target source sample_directory)
         )
     endif()
 
+    if(EXISTS "${FRAMEWORK_ROOT_DIR}/assets/Fonts")
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${FRAMEWORK_ROOT_DIR}/assets/Fonts"
+                "$<TARGET_FILE_DIR:${target}>/assets/Fonts"
+            VERBATIM
+        )
+    endif()
+
     if(WIN32)
-        foreach(SDL_TARGET SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf)
+        foreach(SDL_TARGET SDL3::SDL3 SDL3_image::SDL3_image SDL3_mixer::SDL3_mixer SDL3_ttf::SDL3_ttf)
             add_custom_command(TARGET ${target} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "$<TARGET_FILE:${SDL_TARGET}>"
@@ -150,5 +175,9 @@ function(add_sample target source sample_directory)
     endif()
 endfunction()
 
-add_sample(SampleSquare "${CMAKE_CURRENT_SOURCE_DIR}/Square/main.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/Square")
+add_sample(SampleSquare
+    "${CMAKE_CURRENT_SOURCE_DIR}/Square/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Square"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Square/TestScene.cpp"
+)
 add_sample(SampleImageViewer "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer/main.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer")

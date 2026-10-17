@@ -5,6 +5,8 @@
 
 #include "Config/Config.h"
 
+FontsManager::FontsManager() = default;
+
 FontsManager::~FontsManager()
 {
     shutdown();
@@ -22,26 +24,26 @@ void FontsManager::load()
             SDL_Log("Unable to load font '%s' (%s): %s", name.c_str(), path.c_str(), SDL_GetError());
             continue;
         }
-        _fonts.emplace(name, font);
+        _fontsTTFMap.emplace(name, font);
     }
 }
 
 TTF_Font* FontsManager::getFont(const std::string& name) const noexcept
 {
-    const auto font = _fonts.find(name);
-    return font == _fonts.end() ? nullptr : font->second;
+    const auto font = _fontsTTFMap.find(name);
+    return font == _fontsTTFMap.end() ? nullptr : font->second;
 }
 
 void FontsManager::clear()
 {
-    for (auto& [name, font] : _fonts)
+    for (auto& [name, font] : _fontsTTFMap)
     {
         if (font)
         {
             TTF_CloseFont(font);
         }
     }
-    _fonts.clear();
+    _fontsTTFMap.clear();
 }
 
 void FontsManager::shutdown()

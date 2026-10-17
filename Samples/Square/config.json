@@ -9,6 +9,6 @@
     "sound": {},
     "images": {},
     "fonts": {
-        "defaultFont": ""
+        "defaultFont": "assets/Fonts/arial.ttf"
     }
 }

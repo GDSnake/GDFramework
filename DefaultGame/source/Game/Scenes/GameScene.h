@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 
+#include "Config/Config.h"
 #include "Scene.h"
 #include "Input/InputManager.h"
 

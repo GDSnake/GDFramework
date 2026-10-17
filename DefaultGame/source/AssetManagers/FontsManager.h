@@ -14,7 +14,7 @@ namespace FontColor
 {
     static constexpr SDL_Color Black = { 0,0,0,255 };
     static constexpr SDL_Color Red = { 255,0,0,255 };
-    static constexpr SDL_Color Orange = { 255,50,0,255 };
+    static constexpr SDL_Color Orange = { 255,165,0,255 };
 
     // Add the colours as needed for the map
 
@@ -28,6 +28,7 @@ namespace FontSize
 namespace FontText
 {
     static std::string Title = "Default Game";
+    static std::string Exit = "Press ESC to exit";
     // Define the texts you need
     // TODO create a map from a config file
 }
@@ -44,7 +45,15 @@ struct FontData
 inline const FontData TitleFontInfo = {
     .baseText = FontText::Title,
     .origin = {20.0f, 10.0f},
-    .color = FontColor::Black,
+    .color = FontColor::Red,
+    .fontName = FontNames::DefaultFont,
+    .fontSize = FontSize::Title
+};
+
+inline const FontData ExitFontInfo = {
+    .baseText = FontText::Exit,
+    .origin = {20.0f, 500.0f},
+    .color = FontColor::Orange,
     .fontName = FontNames::DefaultFont,
     .fontSize = FontSize::Title
 };
