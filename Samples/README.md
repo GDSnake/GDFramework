@@ -19,3 +19,15 @@ The executables and their configs are placed in separate runtime directories und
 - `SampleImageViewer` loads a named image through `SpriteManager` and displays it.
 
 The square uses SDL rendering rather than an OpenGL context.
+
+## Controls
+
+### SampleSquare
+
+- `Escape` quits the sample.
+
+### SampleImageViewer
+
+- `1`-`9` or keypad `1`-`9` selects one of the nine blocks in matching order.
+- `W`/`A`/`S`/`D` or the arrow keys move the selected block.
+- `Escape` quits the sample.

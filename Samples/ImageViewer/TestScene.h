@@ -1,8 +1,11 @@
 #pragma once
 
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <box2d/box2d.h>
 
 #include "Config/Config.h"
 #include "Input/InputManager.h"
@@ -26,10 +29,16 @@ public:
 private:
     void render() override;
     void renderTexts();
+    void createPhysicsWorld();
+    void destroyPhysicsWorld();
+    void moveSelectedBody();
 
     std::unique_ptr<InputManager> _input;
     const ConfigData& _configData = Config::getInstance().getConfigData();
     std::vector<std::shared_ptr<Sprite>> _blockSprites;
+    std::array<b2BodyId, 9> _blockBodies{};
+    b2WorldId _worldId = b2_nullWorldId;
+    std::size_t _selectedBlock = 0;
     std::shared_ptr<Sprite> _sprite;
 
     TTF_Font* _titleFont = nullptr;

@@ -4,6 +4,7 @@
 #include <SDL3_image/SDL_image.h>
 
 #include <exception>
+#include <filesystem>
 
 #include "Entities/Sprite.h"
 #include "Config/Config.h"
@@ -44,6 +45,11 @@ void SpriteManager::loadSprites()
     shutdown();
     for (const auto& [name, image] : Config::getInstance().getConfigData().images)
     {
+        if (std::filesystem::is_directory(image.path))
+        {
+            continue;
+        }
+
         try
         {
             _sprites.emplace(name, std::make_shared<Sprite>(image.path, image.width, image.height));

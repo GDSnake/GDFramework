@@ -22,6 +22,13 @@ FetchContent_Declare(
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(json)
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v3.1.1
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(box2d)
 
 if(WIN32)
     if(MSVC OR CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
@@ -121,6 +128,7 @@ target_link_libraries(SampleFramework PUBLIC
     SDL3_image::SDL3_image
     SDL3_mixer::SDL3_mixer
     SDL3_ttf::SDL3_ttf
+    box2d
     nlohmann_json::nlohmann_json
 )
 
