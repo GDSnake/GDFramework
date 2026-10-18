@@ -1,4 +1,4 @@
-# SDL Framework Samples
+# GDFramework Samples
 
 These standalone samples use the framework's `Renderer`, `Sprite`, and `SpriteManager` without modifying the `DefaultGame` sources or build file.
 
