@@ -1,80 +1,28 @@
-#include <SDL3/SDL.h>
+#include <iostream>
+#include <memory>
 
-#include <algorithm>
-
-#include "AssetManagers/SpriteManager.h"
 #include "Config/Config.h"
-#include "Core/Renderer.h"
-#include "Entities/Sprite.h"
+#include "Game/Game.h"
+#include "TestConfig/TestConfig.h"
+#include "TestScene.h"
 
-int main()
-{
-    Config& config = Config::getInstance();
-    config.loadConfig();
-    if (config.getConfigData().hasError)
+int main() {
+
+    Config::getInstance().loadConfig();
+    TestConfig::getInstance().load();
+
+    if (Config::getInstance().getConfigData().hasError)
     {
+        std::cerr << "Configuration file has an error!" << '\n';
+        std::cerr << "Press Enter to exit...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         return 1;
     }
 
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
+    Game game(std::make_unique<TestScene>());
+    if (game.init())
     {
-        SDL_Log("SDL initialization failed: %s", SDL_GetError());
-        return 1;
+        game.run();
     }
-
-    Renderer& renderer = Renderer::getInstance();
-    if (!renderer.init())
-    {
-        SDL_Quit();
-        return 1;
-    }
-
-    SpriteManager& sprites = SpriteManager::getInstance();
-    sprites.load();
-    const std::shared_ptr<Sprite> sprite = sprites.getSprite("sample");
-    if (!sprite)
-    {
-        SDL_Log("Sample image could not be loaded");
-        sprites.shutdown();
-        renderer.shutdown();
-        SDL_Quit();
-        return 1;
-    }
-
-    const SDL_FRect& source = sprite->getSourceRect();
-    const float maxWidth = static_cast<float>(config.getConfigData().width) * 0.8f;
-    const float maxHeight = static_cast<float>(config.getConfigData().height) * 0.8f;
-    const float scale = std::min(maxWidth / source.w, maxHeight / source.h);
-    const float width = source.w * scale;
-    const float height = source.h * scale;
-    const SDL_FRect destination{
-        (static_cast<float>(config.getConfigData().width) - width) * 0.5f,
-        (static_cast<float>(config.getConfigData().height) - height) * 0.5f,
-        width,
-        height
-    };
-
-    bool running = true;
-    SDL_Event event;
-    while (running)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_EVENT_QUIT ||
-                (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_ESCAPE))
-            {
-                running = false;
-            }
-        }
-
-        renderer.setDrawColor({18, 24, 32, 255});
-        renderer.clear();
-        renderer.drawTexture(sprite->getTexture().get(), destination, &source);
-        renderer.present();
-    }
-
-    sprites.shutdown();
-    renderer.shutdown();
-    SDL_Quit();
     return 0;
 }

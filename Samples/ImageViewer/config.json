@@ -6,15 +6,13 @@
         "fullscreen": false,
         "target_fps": 60
     },
-    "sound": {},
+    "sound": {
+        "bgm": "assets/Sound/BGM.mp3"
+    },
     "images": {
-        "sample": {
-            "path": "assets/sample.ppm",
-            "width": 0,
-            "height": 0
-        }
+        "blocks_folder": "assets/Sprites/Blocks/Default"
     },
     "fonts": {
-        "defaultFont": ""
+        "defaultFont": "assets/Fonts/arial.ttf"
     }
 }

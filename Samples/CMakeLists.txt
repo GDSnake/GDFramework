@@ -132,6 +132,7 @@ endif()
 
 function(add_sample target source sample_directory)
     add_executable(${target} "${source}" ${ARGN})
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
     target_link_libraries(${target} PRIVATE SampleFramework)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${target}"
@@ -149,6 +150,15 @@ function(add_sample target source sample_directory)
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${sample_directory}/assets"
+                "$<TARGET_FILE_DIR:${target}>/assets"
+            VERBATIM
+        )
+    endif()
+
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/SampleAssets")
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${CMAKE_CURRENT_SOURCE_DIR}/SampleAssets"
                 "$<TARGET_FILE_DIR:${target}>/assets"
             VERBATIM
         )
@@ -180,4 +190,8 @@ add_sample(SampleSquare
     "${CMAKE_CURRENT_SOURCE_DIR}/Square"
     "${CMAKE_CURRENT_SOURCE_DIR}/Square/TestScene.cpp"
 )
-add_sample(SampleImageViewer "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer/main.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer")
+add_sample(SampleImageViewer
+    "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer/TestScene.cpp"
+)
