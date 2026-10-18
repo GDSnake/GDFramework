@@ -116,3 +116,11 @@ void Renderer::shutdown()
         _window = nullptr;
     }
 }
+
+#if DEBUG_BUILD
+void Renderer::writeFPSOnWindowTitle(Uint64 fps)
+{
+    std::string windowTitle = std::format("{} - FPS: {}", Config::getInstance().getConfigData().title, fps);
+    SDL_SetWindowTitle(_window, windowTitle.c_str());
+}
+#endif

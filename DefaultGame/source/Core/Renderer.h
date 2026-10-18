@@ -29,6 +29,10 @@ public:
     SDL_Renderer* getRenderer() const noexcept;
     void shutdown();
 
+#if DEBUG_BUILD
+	void writeFPSOnWindowTitle(Uint64 fps);
+#endif
+
 private:
     Renderer() = default;
     ~Renderer();

@@ -44,6 +44,14 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${PROJECT_SOURCES} ${PROJE
 include(FetchContent)
 set(FETCHCONTENT_BASE_DIR "${CMAKE_BINARY_DIR}/_deps")
 
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v3.1.1
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(box2d)
+
 set(JSON_LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/JSON/include/nlohmann/json.hpp")
 if(EXISTS "${JSON_LOCAL_PATH}")
     target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/libs/JSON/include")
@@ -115,6 +123,7 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+    box2d
     SDL3::SDL3
     SDL3_image::SDL3_image
     SDL3_mixer::SDL3_mixer
