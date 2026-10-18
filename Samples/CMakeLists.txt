@@ -203,3 +203,8 @@ add_sample(SampleImageViewer
     "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer"
     "${CMAKE_CURRENT_SOURCE_DIR}/ImageViewer/TestScene.cpp"
 )
+add_sample(SampleSceneChange
+    "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/TestScene.cpp"
+)

@@ -17,6 +17,7 @@ The executables and their configs are placed in separate runtime directories und
 
 - `SampleSquare` draws a static square using SDL's renderer.
 - `SampleImageViewer` loads a named image through `SpriteManager` and displays it.
+- `SampleSceneChange` provides a starter scene for implementing scene transitions.
 
 The square uses SDL rendering rather than an OpenGL context.
 
@@ -30,4 +31,8 @@ The square uses SDL rendering rather than an OpenGL context.
 
 - `1`-`9` or keypad `1`-`9` selects one of the nine blocks in matching order.
 - `W`/`A`/`S`/`D` or the arrow keys move the selected block.
+- `Escape` quits the sample.
+
+### SampleSceneChange
+
 - `Escape` quits the sample.

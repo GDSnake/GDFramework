@@ -1,6 +1,6 @@
 {
     "window": {
-        "title": "SDL Sample: Static Square",
+        "title": "GD Framework: Static Square",
         "width": 960,
         "height": 640,
         "fullscreen": false,

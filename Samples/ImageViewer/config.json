@@ -1,6 +1,6 @@
 {
     "window": {
-        "title": "SDL Sample: Image Viewer",
+        "title": "GD Framework: Image Viewer and Physics Demo",
         "width": 960,
         "height": 640,
         "fullscreen": false,
