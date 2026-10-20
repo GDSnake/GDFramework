@@ -27,6 +27,7 @@ public:
     void drawText(TTF_Font* font, const std::string& text, const SDL_FPoint& origin, const SDL_Color& color) const;
     SDL_Window* getWindow() const noexcept;
     SDL_Renderer* getRenderer() const noexcept;
+    bool applyWindowSettings() const;
     void shutdown();
 
 #if DEBUG_BUILD

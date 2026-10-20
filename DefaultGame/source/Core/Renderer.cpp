@@ -103,6 +103,22 @@ SDL_Renderer* Renderer::getRenderer() const noexcept
     return _renderer;
 }
 
+bool Renderer::applyWindowSettings() const
+{
+    if (!_window)
+    {
+        return false;
+    }
+
+    const ConfigData& config = Config::getInstance().getConfigData();
+    if (!SDL_SetWindowFullscreen(_window, config.fullscreen))
+    {
+        return false;
+    }
+
+    return config.fullscreen || SDL_SetWindowSize(_window, config.width, config.height);
+}
+
 void Renderer::shutdown()
 {
     if (_renderer)

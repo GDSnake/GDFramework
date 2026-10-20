@@ -12,6 +12,8 @@ void InputManager::handleEvent(const SDL_Event& event)
 
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
     case SDL_EVENT_MOUSE_BUTTON_UP:
+        _mouseX = static_cast<int>(event.button.x);
+        _mouseY = static_cast<int>(event.button.y);
         updateMouseState(event.button.button, event.button.down);
         break;
 
