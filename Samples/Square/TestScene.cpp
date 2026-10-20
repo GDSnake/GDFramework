@@ -158,3 +158,8 @@ std::string TestScene::getName() const
 {
     return "TestScene";
 }
+
+std::unique_ptr<Scene> TestScene::getNextScene()
+{
+    return {};
+}

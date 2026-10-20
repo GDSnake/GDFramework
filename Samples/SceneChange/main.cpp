@@ -3,7 +3,7 @@
 
 #include "Config/Config.h"
 #include "Game/Game.h"
-#include "TestScene.h"
+#include "MenuScene.h"
 
 int main() {
 
@@ -17,7 +17,7 @@ int main() {
         return 1;
     }
 
-    Game game(std::make_unique<TestScene>());
+    Game game(std::make_unique<MenuScene>());
     if (game.init())
     {
         game.run();

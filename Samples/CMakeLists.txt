@@ -206,5 +206,7 @@ add_sample(SampleImageViewer
 add_sample(SampleSceneChange
     "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/main.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/MenuScene.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/SettingsScene.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/TestScene.cpp"
 )
