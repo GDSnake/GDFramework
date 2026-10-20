@@ -18,6 +18,7 @@ The executables and their configs are placed in separate runtime directories und
 - `SampleSquare` draws a static square using SDL's renderer.
 - `SampleImageViewer` loads a named image through `SpriteManager` and displays it.
 - `SampleSceneChange` provides a starter scene for implementing scene transitions.
+- `SampleScreenScrolling` demonstrates a scrolling car-racing scene with sprite sheets.
 
 The square uses SDL rendering rather than an OpenGL context.
 
@@ -36,3 +37,8 @@ The square uses SDL rendering rather than an OpenGL context.
 ### SampleSceneChange
 
 - `Escape` quits the sample.
+
+## Asset Credits
+
+- Road tileset: nodeturtle, [Free Basic Car Pack and Tilemap](https://nodeturtle.itch.io/free-basic-car-pack-and-tilemap).
+- Car sprites: marcusvh, [2D Cars](https://marcusvh.itch.io/2d-cars).

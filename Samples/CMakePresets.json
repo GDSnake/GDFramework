@@ -5,7 +5,10 @@
       "name": "samples-ninja",
       "displayName": "Samples (Ninja Multi-Config)",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/../out/build/samples-ninja"
+      "binaryDir": "${sourceDir}/../out/build/samples-ninja",
+      "environment": {
+        "PATH": "$env{ProgramFiles}/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja;$penv{PATH}"
+      }
     }
   ],
   "buildPresets": [

@@ -210,3 +210,8 @@ add_sample(SampleSceneChange
     "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/SettingsScene.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/SceneChange/TestScene.cpp"
 )
+add_sample(SampleScreenScrolling
+    "${CMAKE_CURRENT_SOURCE_DIR}/ScreenScrolling/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ScreenScrolling"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ScreenScrolling/TestScene.cpp"
+)

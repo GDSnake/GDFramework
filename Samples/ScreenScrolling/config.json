@@ -1,0 +1,34 @@
+{
+    "window": {
+        "title": "GD Framework: Screen Scrolling Racer",
+        "width": 960,
+        "height": 640,
+        "fullscreen": false,
+        "target_fps": 60
+    },
+    "sound": {},
+    "images": {},
+    "imageSheet": {
+        "road": {
+            "path": "assets/Sprites/Cars_Roads/BasicRoadTileSet.png",
+            "frame_width": 128,
+            "frame_height": 128,
+            "columns": 8,
+            "rows": 8
+        },
+        "cars": {
+            "path": "assets/Sprites/Cars_Roads/2D_TOPDOWN_PIXELART_CARS.png",
+            "frames": [
+                { "x": 0, "y": 0, "width": 28, "height": 64 },
+                { "x": 30, "y": 0, "width": 28, "height": 64 },
+                { "x": 62, "y": 0, "width": 30, "height": 64 },
+                { "x": 96, "y": 0, "width": 32, "height": 64 },
+                { "x": 130, "y": 0, "width": 34, "height": 64 },
+                { "x": 166, "y": 0, "width": 32, "height": 64 }
+            ]
+        }
+    },
+    "fonts": {
+        "defaultFont": "assets/Fonts/arial.ttf"
+    }
+}
