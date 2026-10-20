@@ -10,6 +10,7 @@
 #include <system_error>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
@@ -43,6 +44,23 @@ struct ImageConfigData {
     float height = 0.0f;
 };
 
+struct ImageSheetConfigData {
+    std::string path;
+    float frameWidth = 0.0f;
+    float frameHeight = 0.0f;
+    int columns = 0;
+    int rows = 0;
+
+    struct Frame {
+        float x = 0.0f;
+        float y = 0.0f;
+        float width = 0.0f;
+        float height = 0.0f;
+    };
+
+    std::vector<Frame> frames;
+};
+
 struct ConfigData {
     std::string title = "Default Game Name";
     int width = 1280;
@@ -51,6 +69,7 @@ struct ConfigData {
     int targetFPS = 60;
     bool hasError = false;
     std::unordered_map<std::string, ImageConfigData> images;
+    std::unordered_map<std::string, ImageSheetConfigData> imageSheets;
     std::unordered_map<std::string, std::string> fonts;
     std::unordered_map<std::string, std::string> audio;
 };
@@ -221,6 +240,52 @@ public:
                     }
 
                     cfg.images[image.key()] = std::move(imageConfig);
+                }
+            }
+
+            if (const auto imageSheets = data.find("imageSheet");
+                imageSheets != data.end())
+            {
+                if (!imageSheets->is_object())
+                {
+                    throw std::runtime_error("imageSheet must be an object");
+                }
+                for (auto sheet = imageSheets->begin(); sheet != imageSheets->end(); ++sheet)
+                {
+                    if (!sheet.value().is_object())
+                    {
+                        throw std::runtime_error("each imageSheet entry must be an object");
+                    }
+
+                    ImageSheetConfigData sheetConfig;
+                    sheetConfig.path = sheet.value().at("path").get<std::string>();
+                    sheetConfig.frameWidth = sheet.value().value("frame_width", 0.0f);
+                    sheetConfig.frameHeight = sheet.value().value("frame_height", 0.0f);
+                    sheetConfig.columns = sheet.value().value("columns", 0);
+                    sheetConfig.rows = sheet.value().value("rows", 0);
+                    if (const auto frames = sheet.value().find("frames");
+                        frames != sheet.value().end())
+                    {
+                        if (!frames->is_array())
+                        {
+                            throw std::runtime_error("imageSheet frames must be an array");
+                        }
+                        for (const auto& frame : *frames)
+                        {
+                            if (!frame.is_object())
+                            {
+                                throw std::runtime_error("each imageSheet frame must be an object");
+                            }
+
+                            ImageSheetConfigData::Frame frameConfig;
+                            frameConfig.x = frame.at("x").get<float>();
+                            frameConfig.y = frame.at("y").get<float>();
+                            frameConfig.width = frame.at("width").get<float>();
+                            frameConfig.height = frame.at("height").get<float>();
+                            sheetConfig.frames.push_back(frameConfig);
+                        }
+                    }
+                    cfg.imageSheets[sheet.key()] = std::move(sheetConfig);
                 }
             }
 
