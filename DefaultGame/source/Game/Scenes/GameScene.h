@@ -19,6 +19,7 @@ public:
     std::string getName() const override;
     
     bool shouldQuit() const;
+    std::unique_ptr<Scene> getNextScene() override;
     void handleEvents(const SDL_Event& event) override;
 
 private:

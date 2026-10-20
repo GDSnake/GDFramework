@@ -135,4 +135,13 @@ void Game::update(float dt)
 
     _currentScene->handleInput();
     _currentScene->update(dt);
+
+    if (std::unique_ptr<Scene> nextScene = _currentScene->getNextScene())
+    {
+        //Cleans current scene
+        _currentScene->cleanup();
+        //Releases the current scene and takes ownership of the next scene
+        _currentScene = std::move(nextScene);
+        _currentScene->init();
+    }
 }

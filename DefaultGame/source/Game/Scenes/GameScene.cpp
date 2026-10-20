@@ -83,3 +83,8 @@ std::string GameScene::getName() const
 {
     return "GameScene";
 }
+
+std::unique_ptr<Scene> GameScene::getNextScene()
+{
+    return {};
+}

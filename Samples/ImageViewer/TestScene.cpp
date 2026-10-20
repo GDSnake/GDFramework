@@ -216,3 +216,8 @@ std::string TestScene::getName() const
 {
     return "ImageViewerScene";
 }
+
+std::unique_ptr<Scene> TestScene::getNextScene()
+{
+    return {};
+}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <SDL3/SDL_events.h>
 
 #include <string>
@@ -17,4 +18,5 @@ public:
     virtual void cleanup() = 0;
     virtual std::string getName() const = 0;
     virtual bool shouldQuit() const = 0;
+    virtual std::unique_ptr<Scene> getNextScene() = 0;
 };
