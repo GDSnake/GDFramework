@@ -63,6 +63,15 @@ void Renderer::drawTexture(SDL_Texture* texture, const SDL_FRect& destination, c
     }
 }
 
+void Renderer::drawTextureRotated(SDL_Texture* texture, const SDL_FRect& destination,
+    const SDL_FRect* source, const double angle) const
+{
+    if (_renderer && texture)
+    {
+        SDL_RenderTextureRotated(_renderer, texture, source, &destination, angle, nullptr, SDL_FLIP_NONE);
+    }
+}
+
 void Renderer::drawText(TTF_Font* font, const std::string& text, const SDL_FPoint& origin, const SDL_Color& color) const
 {
     if (!_renderer || !font || text.empty())

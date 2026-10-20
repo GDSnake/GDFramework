@@ -1,8 +1,10 @@
 #pragma once
 
-#include <array>
-#include <memory>
 #include <string>
+#include <memory>
+#include <vector>
+
+#include <box2d/box2d.h>
 
 #include "Config/Config.h"
 #include "Input/InputManager.h"
@@ -26,25 +28,35 @@ public:
     void handleEvents(const SDL_Event& event) override;
 
 private:
+    void loadMap();
+    void createCollisionWorld();
+    void destroyCollisionWorld();
     void render() override;
+    void renderMap();
+    void renderCollisionBoxes();
     void renderHud();
 
-    struct TrafficCar
+    struct CollisionBox
     {
-        float x;
-        float y;
-        float speed;
-        std::size_t frameIndex;
+        b2BodyId body;
+        b2Vec2 halfSize;
     };
 
     std::unique_ptr<InputManager> _input;
     const ConfigData& _configData = Config::getInstance().getConfigData();
     std::shared_ptr<Sprite> _road;
     std::shared_ptr<Sprite> _cars;
-    std::array<TrafficCar, 3> _trafficCars{};
+    std::vector<std::string> _map;
+    b2WorldId _worldId = b2_nullWorldId;
+    b2BodyId _playerBody = b2_nullBodyId;
+    std::vector<CollisionBox> _collisionBodies;
     TTF_Font* _font = nullptr;
     std::string _title;
-    float _playerX = 480.0f;
+    float _playerWorldX = 0.0f;
+    float _cameraX = 0.0f;
+    float _playerAngle = 0.0f;
+    float _mapTileSize = 160.0f;
     float _scrollOffset = 0.0f;
-    float _speed = 280.0f;
+    float _speed = 0.0f;
+    bool _showCollisionBoxes = false;
 };

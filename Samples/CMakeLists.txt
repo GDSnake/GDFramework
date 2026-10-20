@@ -163,6 +163,15 @@ function(add_sample target source sample_directory)
         )
     endif()
 
+    if(EXISTS "${sample_directory}/maps")
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${sample_directory}/maps"
+                "$<TARGET_FILE_DIR:${target}>/maps"
+            VERBATIM
+        )
+    endif()
+
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/SampleAssets")
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory

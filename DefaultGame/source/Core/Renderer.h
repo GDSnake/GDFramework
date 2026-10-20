@@ -24,6 +24,8 @@ public:
     void present() const;
     void setDrawColor(const SDL_Color& color) const;
     void drawTexture(SDL_Texture* texture, const SDL_FRect& destination, const SDL_FRect* source = nullptr) const;
+    void drawTextureRotated(SDL_Texture* texture, const SDL_FRect& destination,
+        const SDL_FRect* source, double angle) const;
     void drawText(TTF_Font* font, const std::string& text, const SDL_FPoint& origin, const SDL_Color& color) const;
     SDL_Window* getWindow() const noexcept;
     SDL_Renderer* getRenderer() const noexcept;
