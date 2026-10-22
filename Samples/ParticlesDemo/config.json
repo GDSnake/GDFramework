@@ -1,0 +1,28 @@
+{
+    "window": {
+        "title": "GD Framework: Particles Demo",
+        "width": 960,
+        "height": 640,
+        "fullscreen": false,
+        "target_fps": 60
+    },
+    "start_entities_number": 10,
+    "sound": {},
+    "images": {},
+    "imageSheet": {
+        "fire_effects": {
+            "path": "assets/Sprites/Fire Effect and Bullet 16x16.png",
+            "frame_width": 16,
+            "frame_height": 16,
+            "frames": [
+                { "x": 0, "y": 0, "width": 16, "height": 16 },
+                { "x": 32, "y": 32, "width": 16, "height": 16 },
+                { "x": 32, "y": 64, "width": 16, "height": 16 },
+                { "x": 32, "y": 80, "width": 16, "height": 16 }
+            ]
+        }
+    },
+    "fonts": {
+        "defaultFont": "assets/Fonts/arial.ttf"
+    }
+}

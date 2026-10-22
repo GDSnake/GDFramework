@@ -111,6 +111,8 @@ endif()
 
 add_library(SampleFramework STATIC
     "${FRAMEWORK_SOURCE_DIR}/Core/Renderer.cpp"
+    "${FRAMEWORK_SOURCE_DIR}/Core/ParticleSystem/ParticleSystem.cpp"
+    "${FRAMEWORK_SOURCE_DIR}/Entities/Entities.cpp"
     "${FRAMEWORK_SOURCE_DIR}/Entities/Sprite.cpp"
     "${FRAMEWORK_SOURCE_DIR}/AssetManagers/SpriteManager.cpp"
     "${FRAMEWORK_SOURCE_DIR}/AssetManagers/AudioManager.cpp"
@@ -223,4 +225,9 @@ add_sample(SampleScreenScrolling
     "${CMAKE_CURRENT_SOURCE_DIR}/ScreenScrolling/main.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/ScreenScrolling"
     "${CMAKE_CURRENT_SOURCE_DIR}/ScreenScrolling/TestScene.cpp"
+)
+add_sample(SampleParticlesDemo
+    "${CMAKE_CURRENT_SOURCE_DIR}/ParticlesDemo/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ParticlesDemo"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ParticlesDemo/TestScene.cpp"
 )
