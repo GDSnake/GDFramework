@@ -67,6 +67,7 @@ struct ConfigData {
     int height = 720;
     bool fullscreen = false;
     int targetFPS = 60;
+    int startEntitiesNumber = 10;
     bool hasError = false;
     std::unordered_map<std::string, ImageConfigData> images;
     std::unordered_map<std::string, ImageSheetConfigData> imageSheets;
@@ -202,6 +203,12 @@ public:
             cfg.height = window.at("height").get<int>();
             cfg.fullscreen = window.at("fullscreen").get<bool>();
             cfg.targetFPS = window.value("target_fps", cfg.targetFPS);
+
+            cfg.startEntitiesNumber = data.value("start_entities_number", cfg.startEntitiesNumber);
+            if (cfg.startEntitiesNumber < 0)
+            {
+                throw std::runtime_error("start_entities_number must not be negative");
+            }
 
             if (const auto sound = data.find("sound"); sound != data.end())
             {

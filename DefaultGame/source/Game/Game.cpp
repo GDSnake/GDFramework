@@ -7,6 +7,7 @@
 #include "AssetManagers/FontsManager.h"
 #include "AssetManagers/SpriteManager.h"
 #include "Config/Config.h"
+#include "Core/ParticleSystem/ParticleSystem.h"
 #include "Core/Renderer.h"
 
 
@@ -101,6 +102,7 @@ void Game::shutdown()
         return;
     }
 
+    ParticleSystem::GetInstance().clearParticles();
     AudioManager::getInstance().shutdown();
     SpriteManager::getInstance().shutdown();
     FontsManager::getInstance().shutdown();
@@ -135,6 +137,7 @@ void Game::update(float dt)
 
     _currentScene->handleInput();
     _currentScene->update(dt);
+    ParticleSystem::GetInstance().update(dt);
 
     if (std::unique_ptr<Scene> nextScene = _currentScene->getNextScene())
     {

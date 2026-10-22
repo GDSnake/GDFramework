@@ -1,5 +1,9 @@
+#pragma once
+
+#include <cstddef>
 #include <memory>
 #include <cstdint>
+#include <limits>
 
 class Sprite;
 
@@ -8,31 +12,33 @@ namespace Core::Particle
     enum class ParticleAnimation : std::uint8_t
     {
         Rain = 0,
+        Spark,
+        PulseSquare,
         Total,
         // Add more particle types as needed
     };
 }
 
-class Particle
+struct ParticleHandle
 {
-    public:
-        Particle( int x, int y, std::shared_ptr<Sprite> texture, Core::Particle::ParticleAnimation type );
+    static constexpr std::size_t InvalidId = std::numeric_limits<std::size_t>::max();
 
-        void render();
+    std::size_t id = InvalidId;
+    std::uint64_t generation = 0;
 
-        void update(float deltaTime);
+    bool operator==(const ParticleHandle&) const = default;
+};
 
-        bool isDead();
-        bool isVisible() const;
-        void setVisible(bool isVisible);
-
-    private:
-        int _posX, _posY;
-
-        int _frame;
-
-        bool _isVisible;
-
-        std::shared_ptr<Sprite> _texture;
-        Core::Particle::ParticleAnimation _type;
+struct ParticleData
+{
+    float positionX = 0.0f;
+    float positionY = 0.0f;
+    std::shared_ptr<Sprite> texture;
+    Core::Particle::ParticleAnimation type = Core::Particle::ParticleAnimation::Rain;
+    int frame = 0;
+    bool visible = true;
+    float velocityX = 0.0f;
+    float velocityY = 0.0f;
+    float age = 0.0f;
+    float lifetime = 1.0f;
 };

@@ -6,6 +6,8 @@
 #include <vector>
 #include <map>
 
+#include "Core/ParticleSystem/ParticleSystem.h"
+
 class Sprite;
 
 struct EntityData
@@ -15,6 +17,7 @@ struct EntityData
     std::shared_ptr<Sprite> sprite;
     bool visible;
     std::string name;
+    std::vector<ParticleHandle> particles;
 };
 
 struct Entities
@@ -33,13 +36,15 @@ struct Entities
   EntityData GetEntity(const std::string& name) const;
   
 private:
-    Entities() = default;
+    Entities();
     ~Entities() = default;
 
     std::vector<int> _xEntities;  
     std::vector<int> _yEntities;
     std::vector<std::shared_ptr<Sprite>> _spriteEntities;
     std::vector<bool> _visibilityEntities;
+    std::vector<std::vector<ParticleHandle>> _particlesEntitiesList;
     std::map<std::string, std::size_t> _nameEntities;
-    //TODO maybe use an ID to store entities instead of relying on the name as the key
+
+    ParticleSystem& _particleSystem;
 };

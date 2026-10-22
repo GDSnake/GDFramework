@@ -152,7 +152,8 @@ if(NOT EXISTS "${CONFIG_FILE}")
     "title": "Default Game Name",
     "window_width": 1280,
     "window_height": 720,
-    "fullscreen": false
+    "fullscreen": false,
+    "start_entities_number": 10
 }
 ]=])
     message(STATUS "Created default config.json")
